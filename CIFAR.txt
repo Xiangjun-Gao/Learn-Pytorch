@@ -1,0 +1,26 @@
+[1,  2000] loss: 2.153
+[1,  4000] loss: 1.783
+[1,  6000] loss: 1.630
+[1,  8000] loss: 1.555
+[1, 10000] loss: 1.485
+[1, 12000] loss: 1.455
+[2,  2000] loss: 1.388
+[2,  4000] loss: 1.363
+[2,  6000] loss: 1.338
+[2,  8000] loss: 1.317
+[2, 10000] loss: 1.301
+[2, 12000] loss: 1.286
+Finished Training
+GroundTruth:    cat  ship  ship plane
+Predicted:    cat  ship  ship plane
+Accuracy of the network on the 10000 test images: 55 %
+Accuracy of plane : 64 %
+Accuracy of   car : 71 %
+Accuracy of  bird : 28 %
+Accuracy of   cat : 25 %
+Accuracy of  deer : 66 %
+Accuracy of   dog : 46 %
+Accuracy of  frog : 73 %
+Accuracy of horse : 62 %
+Accuracy of  ship : 58 %
+Accuracy of truck : 57 %
