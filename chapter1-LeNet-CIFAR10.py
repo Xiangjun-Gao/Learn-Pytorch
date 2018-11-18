@@ -7,7 +7,11 @@ import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+<<<<<<< HEAD
 import time
+=======
+
+>>>>>>> 55d173eee858f0be52a8af603e7e27ecabcd0c62
 ########################################################################
 # The output of torchvision datasets are PILImage images of range [0, 1].
 # We transform them to Tensors of normalized range [-1, 1].
@@ -18,12 +22,20 @@ transform = transforms.Compose([
 ])
 
 trainset = torchvision.datasets.CIFAR10(
+<<<<<<< HEAD
     root='/media/mcislab/GaoXiangjun/Learn_Pytorch/data/', train=True, download=True, transform=transform)
+=======
+    root='./data', train=True, download=True, transform=transform)
+>>>>>>> 55d173eee858f0be52a8af603e7e27ecabcd0c62
 trainloader = torch.utils.data.DataLoader(
     trainset, batch_size=4, shuffle=True, num_workers=2)
 
 testset = torchvision.datasets.CIFAR10(
+<<<<<<< HEAD
     root='/media/mcislab/GaoXiangjun/Learn_Pytorch/data/', train=False, download=True, transform=transform)
+=======
+    root='./data', train=False, download=True, transform=transform)
+>>>>>>> 55d173eee858f0be52a8af603e7e27ecabcd0c62
 testloader = torch.utils.data.DataLoader(
     testset, batch_size=4, shuffle=False, num_workers=2)
 
@@ -69,9 +81,13 @@ def imshow(img):
 def main():
 
     net = LeNet()
+<<<<<<< HEAD
     net.cuda()
     # device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     # net.to(device)
+=======
+
+>>>>>>> 55d173eee858f0be52a8af603e7e27ecabcd0c62
     ########################################################################
     # 3. Define a Loss function and optimizer
     # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -93,12 +109,17 @@ def main():
         running_loss = 0.0
         for i, data in enumerate(trainloader, 0):
             # get the inputs
+<<<<<<< HEAD
             t0 = time.time()
             inputs, labels = data
 
             inputs = inputs.cuda()
             labels = labels.cuda()
 
+=======
+            inputs, labels = data
+
+>>>>>>> 55d173eee858f0be52a8af603e7e27ecabcd0c62
             # zero the parameter gradients
             optimizer.zero_grad()
 
@@ -114,9 +135,13 @@ def main():
                 print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1,
                                                 running_loss / 2000))
                 running_loss = 0.0
+<<<<<<< HEAD
             t1 = time.time()
             print('epoch:%d     batch:%d    time per batch:%f' %
                   (epoch+1, i+1, t1 - t0))
+=======
+
+>>>>>>> 55d173eee858f0be52a8af603e7e27ecabcd0c62
     print('Finished Training')
 
     ########################################################################
@@ -129,12 +154,21 @@ def main():
     # We will check this by predicting the class label that the neural network
     # outputs, and checking it against the ground-truth. If the prediction is
     # correct, we add the sample to the list of correct predictions.
+<<<<<<< HEAD
 
     # Okay, first step. display an image from the test set to get familiar.
     dataiter = iter(testloader)
     images, labels = dataiter.next()
     inputs = inputs.cuda()
     labels = labels.cuda()
+=======
+    #
+    # Okay, first step. display an image from the test set to get familiar.
+
+    dataiter = iter(testloader)
+    images, labels = dataiter.next()
+
+>>>>>>> 55d173eee858f0be52a8af603e7e27ecabcd0c62
     # print images
     imshow(torchvision.utils.make_grid(images))
     print('GroundTruth: ',
@@ -165,10 +199,15 @@ def main():
     with torch.no_grad():
         for data in testloader:
             images, labels = data
+<<<<<<< HEAD
             images = inputs.cuda()
             labels = labels.cuda()
             outputs = net(images)
             _, predicted = torch.max(outputs.deatch(), 1)
+=======
+            outputs = net(images)
+            _, predicted = torch.max(outputs.data, 1)
+>>>>>>> 55d173eee858f0be52a8af603e7e27ecabcd0c62
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
 
@@ -183,15 +222,24 @@ def main():
     # Hmmm, what are the classes that performed well, and the classes that did
     # not perform well:
 
+<<<<<<< HEAD
     class_correct = list(0. for i in range(10))  # 0. float
+=======
+    class_correct = list(0. for i in range(10))
+>>>>>>> 55d173eee858f0be52a8af603e7e27ecabcd0c62
     class_total = list(0. for i in range(10))
     with torch.no_grad():
         for data in testloader:
             images, labels = data
+<<<<<<< HEAD
             images = inputs.cuda()
             labels = labels.cuda()
             outputs = net(images)
             _, predicted = torch.max(outputs.deatch(), 1)
+=======
+            outputs = net(images)
+            _, predicted = torch.max(outputs, 1)
+>>>>>>> 55d173eee858f0be52a8af603e7e27ecabcd0c62
             c = (predicted == labels).squeeze()
             for i in range(4):
                 label = labels[i]
