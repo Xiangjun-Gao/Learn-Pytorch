@@ -1,13 +1,10 @@
 import torch
 import torch.nn as nn
-<<<<<<< HEAD
 import torchvision
 import torch.nn.functional as F
 import torch.optim as optim
 import torchvision.transforms as transforms
 import time
-
-__all__ = ['AlexNet', 'alexnet']
 
 transform = transforms.Compose([
     transforms.Resize(224),
@@ -27,6 +24,7 @@ testloader = torch.utils.data.DataLoader(
 
 classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse',
            'ship', 'truck')
+
 __all__ = ['AlexNet', 'alexnet']
 
 
@@ -57,77 +55,10 @@ class AlexNet(nn.Module):
         self.classifier = nn.Sequential(
             nn.Dropout(),
             nn.Linear(256 * 6 * 6, 4096),
-=======
-
-__all__ = ['AlexNet', 'alexnet']
-
-
-class LRN(nn.Module):
-    def __init__(self,
-                 local_size=1,
-                 alpha=1.0,
-                 beta=0.75,
-                 ACROSS_CHANNELS=True):
-        super(LRN, self).__init__()
-        self.ACROSS_CHANNELS = ACROSS_CHANNELS
-        if ACROSS_CHANNELS:
-            self.average = nn.AvgPool3d(
-                kernel_size=(local_size, 1, 1),
-                stride=1,
-                padding=(int((local_size - 1.0) / 2), 0, 0))
-        else:
-            self.average = nn.AvgPool2d(
-                kernel_size=local_size,
-                stride=1,
-                padding=int((local_size - 1.0) / 2))
-        self.alpha = alpha
-        self.beta = beta
-
-    def forward(self, x):
-        if self.ACROSS_CHANNELS:
-            div = x.pow(2).unsqueeze(1)
-            div = self.average(div).squeeze(1)
-            div = div.mul(self.alpha).add(1.0).pow(self.beta)
-        else:
-            div = x.pow(2)
-            div = self.average(div)
-            div = div.mul(self.alpha).add(1.0).pow(self.beta)
-        x = x.div(div)
-        return x
-
-
-class AlexNet(nn.Module):
-    def __init__(self, num_classes=1000):
-        super(AlexNet, self).__init__()
-        self.features = nn.Sequential(
-            nn.Conv2d(3, 96, kernel_size=11, stride=4, padding=0),
-            nn.ReLU(inplace=True),
-            LRN(local_size=5, alpha=0.0001, beta=0.75),
-            nn.MaxPool2d(kernel_size=3, stride=2),
-            nn.Conv2d(96, 256, kernel_size=5, padding=2, groups=2),
-            nn.ReLU(inplace=True),
-            LRN(local_size=5, alpha=0.0001, beta=0.75),
-            nn.MaxPool2d(kernel_size=3, stride=2),
-            nn.Conv2d(256, 384, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(384, 384, kernel_size=3, padding=1, groups=2),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(384, 256, kernel_size=3, padding=1, groups=2),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=3, stride=2),
-        )
-
-        self.classifier = nn.Sequential(
-            nn.Linear(256 * 6 * 6, 4096),   # 这个6都是提前计算好的
->>>>>>> 55d173eee858f0be52a8af603e7e27ecabcd0c62
             nn.ReLU(inplace=True),
             nn.Dropout(),
             nn.Linear(4096, 4096),
             nn.ReLU(inplace=True),
-<<<<<<< HEAD
-=======
-            nn.Dropout(),
->>>>>>> 55d173eee858f0be52a8af603e7e27ecabcd0c62
             nn.Linear(4096, num_classes),
         )
 
@@ -141,7 +72,6 @@ class AlexNet(nn.Module):
 def alexnet(pretrained=False, **kwargs):
     r"""AlexNet model architecture from the
     `"One weird trick..." <https://arxiv.org/abs/1404.5997>`_ paper.
-<<<<<<< HEAD
 
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
@@ -158,10 +88,10 @@ def main():
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
-    for epoch in range(2):  # loop over the dataset multiple times
+    for epoch in range(10):  # loop over the dataset multiple times
         running_loss = 0.0
+        t0 = time.time()
         for i, data in enumerate(trainloader, 0):
-            t0 = time.time()
             # get the inputs
             inputs, labels = data
             inputs = inputs.cuda()
@@ -182,9 +112,10 @@ def main():
                 print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1,
                                                 running_loss / 2000))
                 running_loss = 0.0
-            t1 = time.time()
-            print('epoch:%d     batch:%d    time per batch:%f' %
-                  (epoch, i, t1 - t0))
+                t1 = time.time()
+                print('epoch:%d     batch:%d    time per 2000 batches:%lf' %
+                      (epoch, i, t1 - t0))
+                t0 = time.time()
     print('Finished Training')
 
     # 5. Test the network on the whole test data
@@ -209,7 +140,7 @@ def main():
         for data in testloader:
             images, labels = data
             images = images.cuda()
-            labels = labels.cuad()
+            labels = labels.cuda()
             outputs = net(images)
             _, predicted = torch.max(outputs, 1)
             c = (predicted == labels).squeeze()
@@ -225,17 +156,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-=======
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-    """
-
-    model = AlexNet(**kwargs)
-
-    if pretrained:
-        model_path = 'model_list/alexnet.pth.tar'
-        pretrained_model = torch.load(model_path)
-        model.load_state_dict(pretrained_model['state_dict'])
-
-    return model
->>>>>>> 55d173eee858f0be52a8af603e7e27ecabcd0c62
