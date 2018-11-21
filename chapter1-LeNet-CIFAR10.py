@@ -130,36 +130,6 @@ def main():
     # outputs, and checking it against the ground-truth. If the prediction is
     # correct, we add the sample to the list of correct predictions.
 
-    # Okay, first step. display an image from the test set to get familiar.
-    dataiter = iter(testloader)
-    images, labels = dataiter.next()
-    inputs = inputs.cuda()
-    labels = labels.cuda()
-    # print images
-    imshow(torchvision.utils.make_grid(images))
-    print('GroundTruth: ',
-          ' '.join('%5s' % classes[labels[j]] for j in range(4)))
-
-    ########################################################################
-    # Okay, now see what the neural network thinks these examples above are:
-
-    outputs = net(images)
-
-    ########################################################################
-    # The outputs are energies for the 10 classes.
-    # Higher the energy for a class, the more the network
-    # thinks that the image is of the particular class.
-    # So, let's get the index of the highest energy:
-    _, predicted = torch.max(outputs, 1)
-
-    print('Predicted: ',
-          ' '.join('%5s' % classes[predicted[j]] for j in range(4)))
-
-    ########################################################################
-    # The results seem pretty good.
-    #
-    # Let us look at how the network performs on the whole dataset.
-
     correct = 0
     total = 0
     with torch.no_grad():
@@ -168,7 +138,7 @@ def main():
             images = inputs.cuda()
             labels = labels.cuda()
             outputs = net(images)
-            _, predicted = torch.max(outputs.deatch(), 1)
+            _, predicted = torch.max(outputs.detach(), 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
 
@@ -191,7 +161,7 @@ def main():
             images = inputs.cuda()
             labels = labels.cuda()
             outputs = net(images)
-            _, predicted = torch.max(outputs.deatch(), 1)
+            _, predicted = torch.max(outputs.detach(), 1)
             c = (predicted == labels).squeeze()
             for i in range(4):
                 label = labels[i]

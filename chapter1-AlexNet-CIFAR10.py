@@ -83,7 +83,7 @@ def alexnet(pretrained=False, **kwargs):
 
 
 def main():
-    net = AlexNet()
+    net =alexnet()
     net.cuda()
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
@@ -127,7 +127,7 @@ def main():
             images = images.cuda()
             labels = labels.cuad()
             outputs = net(images)
-            _, predicted = torch.max(outputs, 1)
+            _, predicted = torch.max(outputs.detach(), 1)
             total += 1
             correct += (predicted == labels).sum().item
 
@@ -142,7 +142,7 @@ def main():
             images = images.cuda()
             labels = labels.cuda()
             outputs = net(images)
-            _, predicted = torch.max(outputs, 1)
+            _, predicted = torch.max(outputs.detach(), 1)
             c = (predicted == labels).squeeze()
             for i in range(4):
                 label = labels[i]
