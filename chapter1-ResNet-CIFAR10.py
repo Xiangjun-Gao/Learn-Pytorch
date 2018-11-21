@@ -243,8 +243,8 @@ def main():
     net.cuda()
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
-
-    for epoch in range(10):  # loop over the dataset multiple times
+    epoches = 10
+    for epoch in range(epoches):  # loop over the dataset multiple times
         running_loss = 0.0
         t0 = time.time()
         for i, data in enumerate(trainloader, 0):
@@ -284,11 +284,11 @@ def main():
             images = images.cuda()
             labels = labels.cuda()
             outputs = net(images)
-            _, predicted = torch.max(outputs, 1)
-            total += 1
-            correct += (predicted == labels).sum().item
+            _, predicted = torch.max(outputs.detach(), 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
 
-            print('Accuracy of the network on the 10000 test images: %d %%' %
+    print('Accuracy of the network on the 10000 test images: %d %%' %
                   (100 * correct / total))
 
     class_correct = list(0. for i in range(10))
@@ -297,9 +297,9 @@ def main():
         for data in testloader:
             images, labels = data
             images = images.cuda()
-            labels = labels.cuad()
+            labels = labels.cuda()
             outputs = net(images)
-            _, predicted = torch.max(outputs, 1)
+            _, predicted = torch.max(outputs.detach(), 1)
             c = (predicted == labels).squeeze()
             for i in range(4):
                 label = labels[i]

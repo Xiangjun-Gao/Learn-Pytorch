@@ -87,8 +87,9 @@ def main():
     # This is when things start to get interesting.
     # We simply have to loop over our data iterator, and feed the inputs to the
     # network and optimize.
-
-    for epoch in range(10):  # loop over the dataset multiple times
+    loss_list = []
+    epoches = 20
+    for epoch in range(epoches):  # loop over the dataset multiple times
         t0 = time.time()
         running_loss = 0.0
         for i, data in enumerate(trainloader, 0):
@@ -109,15 +110,18 @@ def main():
 
             # print statistics
             running_loss += loss.item()
+            loss_list.append(running_loss)
             if i % 2000 == 1999:  # print every 2000 mini-batches
                 print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1,
                                                 running_loss / 2000))
                 running_loss = 0.0
                 t1 = time.time()
-                print('epoch:%d     batch:%d    time per 2000 batches:%lf' %
-                      (epoch+1, i+1, t1 - t0))
+                #print('epoch:%d     batch:%d    time per 2000 batches:%lf' %
+                #      (epoch+1, i+1, t1 - t0))
                 t0 = time.time()
     print('Finished Training')
+    plt.plot(list(range((i+1)*epoches)), loss_list)
+
 
     ########################################################################
     # 5. Test the network on the test data
@@ -130,45 +134,15 @@ def main():
     # outputs, and checking it against the ground-truth. If the prediction is
     # correct, we add the sample to the list of correct predictions.
 
-    # Okay, first step. display an image from the test set to get familiar.
-    dataiter = iter(testloader)
-    images, labels = dataiter.next()
-    inputs = inputs.cuda()
-    labels = labels.cuda()
-    # print images
-    imshow(torchvision.utils.make_grid(images))
-    print('GroundTruth: ',
-          ' '.join('%5s' % classes[labels[j]] for j in range(4)))
-
-    ########################################################################
-    # Okay, now see what the neural network thinks these examples above are:
-
-    outputs = net(images)
-
-    ########################################################################
-    # The outputs are energies for the 10 classes.
-    # Higher the energy for a class, the more the network
-    # thinks that the image is of the particular class.
-    # So, let's get the index of the highest energy:
-    _, predicted = torch.max(outputs, 1)
-
-    print('Predicted: ',
-          ' '.join('%5s' % classes[predicted[j]] for j in range(4)))
-
-    ########################################################################
-    # The results seem pretty good.
-    #
-    # Let us look at how the network performs on the whole dataset.
-
     correct = 0
     total = 0
     with torch.no_grad():
         for data in testloader:
             images, labels = data
-            images = inputs.cuda()
+            images = images.cuda()
             labels = labels.cuda()
             outputs = net(images)
-            _, predicted = torch.max(outputs.deatch(), 1)
+            _, predicted = torch.max(outputs.detach(), 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
 
@@ -188,10 +162,10 @@ def main():
     with torch.no_grad():
         for data in testloader:
             images, labels = data
-            images = inputs.cuda()
+            images = images.cuda()
             labels = labels.cuda()
             outputs = net(images)
-            _, predicted = torch.max(outputs.deatch(), 1)
+            _, predicted = torch.max(outputs.detach(), 1)
             c = (predicted == labels).squeeze()
             for i in range(4):
                 label = labels[i]
