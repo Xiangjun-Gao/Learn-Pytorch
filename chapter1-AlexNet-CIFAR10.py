@@ -129,8 +129,13 @@ def main():
             labels = labels.cuda()
             outputs = net(images)
             _, predicted = torch.max(outputs.detach(), 1)
+<<<<<<< HEAD
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
+=======
+            total += 1
+            correct += (predicted == labels).sum().item
+>>>>>>> c399a7ef11744e5e8e15e7dacc18af3d7addaa75
 
     print('Accuracy of the network on the 10000 test images: %d %%' %
                   (100 * correct / total))
