@@ -15,12 +15,12 @@ transform = transforms.Compose([
 trainset = torchvision.datasets.CIFAR10(
     root='/media/mcislab/GaoXiangjun/Learn_Pytorch/data/', train=True, download=True, transform=transform)
 trainloader = torch.utils.data.DataLoader(
-    trainset, batch_size=4, shuffle=True)
+    trainset, batch_size=50, shuffle=True)
 
 testset = torchvision.datasets.CIFAR10(
     root='/media/mcislab/GaoXiangjun/Learn_Pytorch/data/', train=False, download=True, transform=transform)
 testloader = torch.utils.data.DataLoader(
-    testset, batch_size=4, shuffle=False)
+    testset, batch_size=50, shuffle=False)
 
 classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse',
            'ship', 'truck')
@@ -88,8 +88,8 @@ def main():
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
-    epoches = 100
-    for epoch in range(epoches):  # loop over the dataset multiple times
+    epochs = 20
+    for epoch in range(epochs):  # loop over the dataset multiple times
         running_loss = 0.0
         t0 = time.time()
         for i, data in enumerate(trainloader, 0):
@@ -114,8 +114,8 @@ def main():
                                                 running_loss / 2000))
                 running_loss = 0.0
                 t1 = time.time()
-                print('epoch:%d     batch:%d    time per 2000 batches:%lf' %
-                      (epoch, i, t1 - t0))
+                #print('epoch:%d     batch:%d    time per 2000 batches:%lf' %
+                      #(epoch, i, t1 - t0))
                 t0 = time.time()
     print('Finished Training')
 
@@ -129,13 +129,10 @@ def main():
             labels = labels.cuda()
             outputs = net(images)
             _, predicted = torch.max(outputs.detach(), 1)
-<<<<<<< HEAD
+
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
-=======
-            total += 1
-            correct += (predicted == labels).sum().item
->>>>>>> c399a7ef11744e5e8e15e7dacc18af3d7addaa75
+
 
     print('Accuracy of the network on the 10000 test images: %d %%' %
                   (100 * correct / total))
