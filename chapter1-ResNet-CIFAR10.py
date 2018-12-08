@@ -7,6 +7,12 @@ import torchvision.transforms as transforms
 import time
 import math
 import torch.utils.model_zoo as model_zoo
+from tensorboardX import SummaryWriter
+
+# 超参数设置
+EPOCH = 50   #遍历数据集次数
+BATCH_SIZE = 4      #批处理尺寸(batch_size)
+LR = 0.001        #学习率
 
 
 __all__ = ['ResNet', 'resnet18', 'resnet34', 'resnet50', 'resnet101',
@@ -30,12 +36,12 @@ transform = transforms.Compose([
 trainset = torchvision.datasets.CIFAR10(
     root='/media/mcislab/GaoXiangjun/Learn_Pytorch/data/', train=True, download=True, transform=transform)
 trainloader = torch.utils.data.DataLoader(
-    trainset, batch_size=4, shuffle=True)
+    trainset, batch_size=BATCH_SIZE, shuffle=True)
 
 testset = torchvision.datasets.CIFAR10(
     root='/media/mcislab/GaoXiangjun/Learn_Pytorch/data/', train=False, download=True, transform=transform)
 testloader = torch.utils.data.DataLoader(
-    testset, batch_size=4, shuffle=False)
+    testset, batch_size=BATCH_SIZE, shuffle=False)
 
 classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse',
            'ship', 'truck')
@@ -239,17 +245,22 @@ def resnet152(pretrained=False, **kwargs):
 
 
 def main():
-    net = resnet101()
+
+    writer = SummaryWriter('ResNet_CIFAR')
+    net =resnet101()
     net.cuda()
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
-    epoches = 30
-    for epoch in range(epoches):  # loop over the dataset multiple times
-        running_loss = 0.0
+    optimizer = optim.SGD(net.parameters(), lr=LR, momentum=0.9)
+
+    for epoch in range(EPOCH):  # loop over the dataset multiple times
         t0 = time.time()
+        running_loss = 0.0
+        total_train = 0
+        correct_train = 0
         for i, data in enumerate(trainloader, 0):
             # get the inputs
             inputs, labels = data
+
             inputs = inputs.cuda()
             labels = labels.cuda()
 
@@ -258,6 +269,11 @@ def main():
 
             # forward + backward + optimize
             outputs = net(inputs)
+            _, predicted = torch.max(outputs.detach(), 1)
+            total_train += labels.size(0)
+            correct_train += (predicted == labels).sum().item()
+
+            # 计算loss    反向传播
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
@@ -267,13 +283,37 @@ def main():
             if i % 2000 == 1999:  # print every 2000 mini-batches
                 print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1,
                                                 running_loss / 2000))
+                writer.add_scalar("train_loss", running_loss/2000, (epoch)*len(trainloader)/2000 + i/2000)
                 running_loss = 0.0
                 t1 = time.time()
-                print('epoch:%d     batch:%d    time per 2000 batches:%lf' %
-                      (epoch, i, t1 - t0))
+                #print('epoch:%d     batch:%d    time per 2000 batches:%lf' %
+                #      (epoch+1, i+1, t1 - t0))
                 t0 = time.time()
 
+        print('epoch:%d    train_acc：%d%%' % (epoch + 1, (100 * correct_train / total_train)))
+        writer.add_scalar('train_acc', (100 * correct_train / total_train),epoch+1)
+
+        with torch.no_grad():
+            correct = 0
+            total = 0
+            for data in testloader:
+                images, labels = data
+                images = images.cuda()
+                labels = labels.cuda()
+                outputs = net(images)
+                _, predicted = torch.max(outputs.detach(), 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+
+            print('epoch:%d    val_acc：%d%%' % (epoch + 1, (100 * correct / total)))
+            writer.add_scalar('val_acc', (100 * correct / total),epoch + 1)
+
+        # 保存每个epoch下的模型参数
+        torch.save(net.state_dict(), './ResNet_CIFAR/ResNet_CIFAR_%03d_params.pkl' % (epoch + 1))
+
     print('Finished Training')
+    writer.export_scalars_to_json("./ResNet_MNIST/ResNet_MNIST.json")
+    writer.close()
 
     # 5. Test the network on the whole test data
     correct = 0
@@ -285,11 +325,13 @@ def main():
             labels = labels.cuda()
             outputs = net(images)
             _, predicted = torch.max(outputs.detach(), 1)
+
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
 
+
     print('Accuracy of the network on the 10000 test images: %d %%' %
-          (100 * correct / total))
+                  (100 * correct / total))
 
     class_correct = list(0. for i in range(10))
     class_total = list(0. for i in range(10))
@@ -309,7 +351,6 @@ def main():
     for i in range(10):
         print('Accuracy of %5s : %2d %%' %
               (classes[i], 100 * class_correct[i] / class_total[i]))
-
 
 if __name__ == '__main__':
     main()

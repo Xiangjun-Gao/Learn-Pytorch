@@ -50,7 +50,7 @@ class LeNet(nn.Module):
 # opt = parser.parse_args()
 
 # 超参数设置
-EPOCH = 20   #遍历数据集次数
+EPOCH = 50   #遍历数据集次数
 BATCH_SIZE = 64      #批处理尺寸(batch_size)
 LR = 0.001        #学习率
 
@@ -123,6 +123,7 @@ if __name__ == "__main__":
             if i % 100 == 99:
                 print('[%d, %d] loss: %.03f'
                       % (epoch + 1, i + 1, sum_loss / 100))
+                writer.add_scalar("train_loss", sum_loss/100, (epoch)*len(trainloader)/100 + i/100)
                 sum_loss = 0.0
 
         print('epoch:%d    train_acc：%d%%' % (epoch + 1, (100 * correct_train / total_train)))
@@ -142,9 +143,11 @@ if __name__ == "__main__":
                 correct += (predicted == labels).sum().item()
 
             print('epoch:%d    val_acc：%d%%' % (epoch + 1, (100 * correct / total)))
-            writer.add_scalar('val_acc', (100 * correct / total),epoch+1)
+            writer.add_scalar('val_acc', (100 * correct / total),epoch + 1)
 
+        # 保存每个epoch下的模型参数
         torch.save(net.state_dict(), './LeNet_MNIST/LeNet_MNIST_%03d_params.pkl' % (epoch + 1))
 
+    print("Finished Training")
     writer.export_scalars_to_json("./LeNet_MNIST/LeNet_MNIST.json")
     writer.close()
